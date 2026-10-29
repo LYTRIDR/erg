@@ -1,0 +1,5 @@
+{
+  "private": true,
+  "description": "Makes `node --test test/` work on Node 22+, which runs a directory argument as a module: its entry is the unit test file. e2e.mjs is run separately with `node test/e2e.mjs`.",
+  "main": "core.test.js"
+}
