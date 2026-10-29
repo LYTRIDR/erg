@@ -1,0 +1,1340 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0b0d10">
+<link rel="icon" href="data:,">
+<title>ERG</title>
+<style>
+:root{--bg:#0b0d10;--panel:#14181d;--panel2:#1c2228;--line:#2a323b;--text:#e9edf1;--muted:#8a94a0;--accent:#4da3ff;--bad:#e5484d;
+--z1:#7f8c99;--z2:#3b8bd4;--z3:#36b37e;--z4:#e8c23a;--z5:#f28c28;--z6:#e5484d}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+[hidden]{display:none !important}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--text);
+  font:18px/1.35 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;font-variant-numeric:tabular-nums}
+body{padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);overscroll-behavior:none}
+button{font:inherit;color:inherit;cursor:pointer}
+h1,h2,h3{margin:0 0 8px;line-height:1.15}
+h1{font-size:34px}h2{font-size:26px}h3{font-size:20px}
+p{margin:0 0 10px}
+.muted{color:var(--muted)}
+.screen{max-width:1180px;margin:0 auto;padding:16px 20px 48px}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.row.between{justify-content:space-between}
+.grow{flex:1 1 0}
+.stack>*+*{margin-top:14px}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:16px}
+
+/* buttons: all at least 64 px tall, high contrast, nothing hover-only */
+.btn{min-height:64px;padding:0 24px;border-radius:14px;border:2px solid #3a4550;background:var(--panel2);font-size:22px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:10px;text-align:center;user-select:none;-webkit-user-select:none}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#04101f}
+.btn.danger{background:#3a1416;border-color:var(--bad);color:#ffd9da}
+.btn.armed{background:var(--bad);border-color:var(--bad);color:#fff}
+.btn.big{min-height:104px;font-size:32px;width:100%}
+.btn.wide{width:100%}
+.btn.small{min-height:64px;font-size:18px;padding:0 18px}
+.btn.link{background:none;border-color:transparent;color:var(--accent);padding:0 12px}
+.btn[disabled]{opacity:.4;cursor:not-allowed}
+.btn.on{background:#1f4d2f;border-color:#36b37e}
+.chip{min-height:48px;padding:0 18px;border-radius:999px;border:2px solid var(--line);background:var(--panel);font-size:17px;font-weight:600}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#04101f}
+.chips{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.badge{display:inline-block;padding:4px 12px;border-radius:999px;background:#264a73;color:#cfe5ff;font-size:15px;font-weight:700;letter-spacing:.03em}
+.badge.sug{background:#e8c23a;color:#241c00}
+.note{background:#241c00;border:2px solid #6d5a14;color:#f6e6a6;border-radius:12px;padding:12px 14px}
+.status{min-height:28px;color:var(--muted)}
+.topbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-bottom:8px}
+
+/* library */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(330px,1fr));gap:16px;margin-top:8px}
+.wk{background:var(--panel);border:2px solid var(--line);border-radius:16px;padding:16px;text-align:left;display:flex;flex-direction:column;justify-content:flex-start;width:100%;position:relative}
+.wk .prof{margin-top:auto}
+.wk h3{font-size:22px;margin-right:90px}
+.wk .meta{display:flex;gap:14px;color:var(--muted);font-size:16px;margin:2px 0 8px}
+.wk .meta b{color:var(--text)}
+.wk p{font-size:15px;color:#b4bcc5;margin:8px 0;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.wk .badge{position:absolute;top:14px;right:14px}
+.prof{width:100%;height:72px;display:block;border-radius:8px;background:#0e1115}
+.prof.big{height:170px}
+.steps{margin:8px 0 0;padding-left:22px}
+.steps li{margin:4px 0;font-size:19px}
+
+/* generic stat grid */
+.stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.stat{background:var(--panel);border:2px solid var(--line);border-radius:14px;padding:12px 14px}
+.stat small{display:block;color:var(--muted);font-size:14px;letter-spacing:.05em;text-transform:uppercase}
+.stat b{font-size:32px}
+.chart{width:100%;height:auto;display:block;background:#0e1115;border-radius:12px}
+.list .item{display:flex;width:100%;gap:14px;align-items:center;justify-content:space-between;text-align:left;background:var(--panel);
+  border:2px solid var(--line);border-radius:14px;padding:14px 16px;margin-bottom:10px;min-height:64px}
+.stepper{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.stepper .val{min-width:120px;text-align:center;font-size:44px;font-weight:700}
+
+/* bottom sheet */
+#sheet{position:fixed;top:0;right:0;bottom:0;left:0;background:rgba(0,0,0,.6);display:flex;align-items:flex-end;justify-content:center;z-index:50}
+#sheet[hidden]{display:none}
+#sheet .box{background:var(--panel);border:2px solid var(--line);border-radius:20px 20px 0 0;width:100%;max-width:760px;padding:22px 22px calc(26px + env(safe-area-inset-bottom))}
+#sheet .box .stack>*+*{margin-top:12px}
+
+/* toast */
+#toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(14px + env(safe-area-inset-bottom));z-index:60;max-width:min(92vw,760px);
+  background:#222a32;border:2px solid #4b5866;border-radius:14px;padding:12px 16px;display:flex;gap:14px;align-items:center;font-size:18px}
+#toast[hidden]{display:none}
+#toast .btn{min-height:64px;font-size:18px}
+.riding #toast{bottom:auto;top:calc(64px + env(safe-area-inset-top))}
+
+/* ride screen */
+.ride{position:fixed;top:0;right:0;bottom:0;left:0;display:grid;grid-template-rows:auto minmax(0,1fr) auto auto auto auto;gap:10px;padding:calc(10px + env(safe-area-inset-top)) 18px calc(10px + env(safe-area-inset-bottom));
+  background:var(--bg);user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;height:100vh;height:100dvh;grid-template-columns:minmax(0,1fr)}
+.r-top{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:24px;font-weight:600}
+.r-top .name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+.r-top .clock{color:var(--muted);flex:none;white-space:nowrap}
+.r-top .badge{font-size:22px;padding:6px 16px;flex:none;white-space:nowrap}
+.r-main{display:grid;grid-template-columns:1fr 1fr;gap:14px;min-height:0}
+.r-card{background:var(--panel);border-radius:18px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:0;overflow:hidden}
+.r-card .lbl{color:var(--muted);font-size:clamp(14px,2.6vh,26px);letter-spacing:.2em;font-weight:700}
+.r-card .num{font-size:min(32vh,24vw);line-height:.95;font-weight:800;white-space:nowrap;letter-spacing:-.02em}
+.r-sub{display:flex;justify-content:space-around;gap:12px;font-size:clamp(22px,4.4vh,40px)}
+.r-sub .lbl{color:var(--muted);font-size:.5em;letter-spacing:.15em;margin-right:8px}
+.r-sub b{font-weight:800}
+.r-sub small{color:var(--muted);font-size:.55em}
+.r-int{display:flex;align-items:baseline;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.r-int .t{font-size:clamp(34px,7vh,64px);font-weight:800}
+.r-int .n{font-size:clamp(20px,3.6vh,34px);color:#cfd6dd;text-align:right;flex:1}
+.r-prof .prof{height:clamp(56px,9vh,96px)}
+.r-btns{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+.r-btns .btn{min-height:max(64px,9vh);font-size:clamp(18px,3vh,28px);padding:0 8px}
+.r-note{display:flex;gap:12px;align-items:center;justify-content:space-between}
+@media (orientation:portrait){
+  .r-main{grid-template-columns:1fr;grid-auto-rows:minmax(0,1fr)}
+  .r-card{flex-direction:row;justify-content:space-between;padding:0 28px}
+  .r-card .num{font-size:min(24vh,36vw)}
+  .r-btns{grid-template-columns:repeat(6,1fr)}
+  .r-btns .btn{grid-column:span 2}
+  .r-btns .btn:nth-child(n+4){grid-column:span 3}
+}
+@media (max-width:520px){
+  h1{font-size:28px}.cards{grid-template-columns:1fr}.btn{font-size:19px}
+  .r-top{font-size:18px}.r-top .badge{font-size:16px;padding:4px 10px}
+  .r-card{flex-direction:column;justify-content:center;padding:0}
+  .r-card .num{font-size:min(17vh,27vw)}
+  .r-sub{flex-wrap:wrap;font-size:20px;gap:4px 16px}
+  .r-int .t{font-size:36px}.r-int .n{font-size:18px}
+}
+</style>
+</head>
+<body>
+<main id="screen"></main>
+<div id="sheet" hidden></div>
+<div id="toast" hidden></div>
+<script src="core.js"></script>
+<script src="workouts.js"></script>
+<script>
+(function () {
+'use strict';
+const C = ERGCore;
+const { UUIDS, zoneOf, flattenWorkout, targetAt, computeMetrics, fmtClock, fmtHM } = C;
+const WK = globalThis.WORKOUTS, CATS = globalThis.WORKOUT_CATEGORIES;
+
+// ---------------------------------------------------------------------------
+// URL flags. Test mode and debug hooks exist only when one of these is present.
+//   ?sim=1        demo trainer button   ?speed=N  clock runs N x faster, audio off
+//   ?simFail=380  demo trainer collapses once the target reaches 380 W
+// ---------------------------------------------------------------------------
+const Q = new URLSearchParams(location.search);
+const SIM = Q.get('sim') === '1';
+const SPEED = Math.min(600, Math.max(1, Number(Q.get('speed')) || 1));
+const TESTING = SIM || Q.has('speed');
+const SIM_FAIL = Number(Q.get('simFail')) || 0;
+const HAS_BT = !!navigator.bluetooth;
+
+// ---------------------------------------------------------------------------
+// Small helpers
+// ---------------------------------------------------------------------------
+const $ = id => document.getElementById(id);
+const ESC = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' };
+const esc = s => String(s).replace(/[&<>"']/g, c => ESC[c]);
+const clamp = (v, lo, hi) => Math.min(hi, Math.max(lo, v));
+const sleep = ms => new Promise(r => setTimeout(r, ms));
+const round2 = v => Math.round(v * 100) / 100;
+const fmtDay = ms => new Date(ms).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+const fmtDateTime = ms => fmtDay(ms) + ', ' + new Date(ms).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+const nz = (v, d) => (v == null || !isFinite(v) ? d : v);
+const show = (v, unit) => (v == null || !isFinite(v) ? '—' : Math.round(v) + (unit || ''));
+
+// ---------------------------------------------------------------------------
+// State
+// ---------------------------------------------------------------------------
+const state = {
+  screen: 'connect',
+  ftp: null,                       // watts, or null when not set
+  ftpSource: null,                 // {kind:'ramp'|'20min'|'manual'|'auto', date}
+  settings: { voice: true, beeps: true, autoEase: true, keepAwake: true },
+  trainer: null, hrm: null,
+  ride: null,                      // see beginRide()
+  live: { power: null, cadence: null, hr: null, lastDataAt: 0, hrAt: 0, recent: [] },
+  summary: null,                   // what the Summary screen is showing
+  status: ''                       // last trainer / heart-rate status line
+};
+const ui = { cat: 'all', dur: null, workoutId: null, scale: 1, armed: null, noteDismissed: false, history: [], sheet: null, handFtp: 200 };
+
+// ---------------------------------------------------------------------------
+// Preferences (localStorage; every access is wrapped, it can be unavailable)
+// ---------------------------------------------------------------------------
+const PREF_KEY = 'erg.v1';
+function loadPrefs() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PREF_KEY) || 'null');
+    if (!p) return;
+    if (isFinite(p.ftp) && p.ftp > 0) state.ftp = p.ftp;
+    if (p.ftpSource && typeof p.ftpSource === 'object') state.ftpSource = p.ftpSource;
+    if (p.settings) for (const k of Object.keys(state.settings)) if (typeof p.settings[k] === 'boolean') state.settings[k] = p.settings[k];
+    ui.noteDismissed = !!p.autoLockNoteDismissed;
+  } catch (e) { /* ignore */ }
+}
+function savePrefs() {
+  try {
+    localStorage.setItem(PREF_KEY, JSON.stringify({ ftp: state.ftp, ftpSource: state.ftpSource, settings: state.settings, autoLockNoteDismissed: ui.noteDismissed }));
+  } catch (e) { /* ignore */ }
+}
+function setFtp(watts, kind) {
+  state.ftp = clamp(Math.round(watts), 40, 700);
+  state.ftpSource = { kind: kind || 'manual', date: Date.now() };
+  savePrefs();
+}
+const FTP_WORDS = { ramp: 'ramp test', '20min': '20-min test', manual: 'set by hand', auto: 'from a ride' };
+function ftpLine() {
+  if (!state.ftp) return 'FTP not set — do the Ramp Test';
+  const s = state.ftpSource;
+  return 'FTP ' + state.ftp + (s ? ' · ' + (FTP_WORDS[s.kind] || s.kind) + ', ' + fmtDay(s.date) : '');
+}
+
+// ---------------------------------------------------------------------------
+// Ride storage: IndexedDB (summary in 'rides', 1 Hz samples in 'samples'),
+// falling back to localStorage if IndexedDB throws.
+// ---------------------------------------------------------------------------
+const packSamples = ss => ss.map(s => [s.t, s.target, s.power, s.cadence, s.hr]);
+const unpackSamples = a => a.map(x => ({ t: x[0], target: x[1], power: x[2], cadence: x[3], hr: x[4] }));
+
+const RideStore = (() => {
+  const LS_LIST = 'erg.rides', LS_S = 'erg.s.';
+  let dbp = null, useLS = false;
+  function open() {
+    if (!dbp) dbp = new Promise((resolve, reject) => {
+      try {
+        const req = indexedDB.open('erg', 1);
+        req.onupgradeneeded = () => { req.result.createObjectStore('rides', { keyPath: 'id' }); req.result.createObjectStore('samples'); };
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = () => reject(req.error || new Error('IndexedDB error'));
+        req.onblocked = () => reject(new Error('IndexedDB blocked'));
+      } catch (e) { reject(e); }
+    });
+    return dbp;
+  }
+  const done = tx => new Promise((res, rej) => { tx.oncomplete = () => res(); tx.onerror = tx.onabort = () => rej(tx.error || new Error('IndexedDB error')); });
+  const asPromise = req => new Promise((res, rej) => { req.onsuccess = () => res(req.result); req.onerror = () => rej(req.error); });
+  async function run(viaIdb, viaLs) {
+    if (!useLS) { try { return await viaIdb(await open()); } catch (e) { useLS = true; } }
+    return viaLs();
+  }
+  const lsList = () => { try { return JSON.parse(localStorage.getItem(LS_LIST) || '[]'); } catch (e) { return []; } };
+  const byNewest = (a, b) => b.startedAt - a.startedAt;
+
+  return {
+    put: (ride, samples) => run(async db => {
+      const tx = db.transaction(['rides', 'samples'], 'readwrite');
+      tx.objectStore('rides').put(ride);
+      tx.objectStore('samples').put(packSamples(samples), ride.id);
+      await done(tx);
+      return true;
+    }, () => {
+      try {
+        localStorage.setItem(LS_S + ride.id, JSON.stringify(packSamples(samples)));
+        localStorage.setItem(LS_LIST, JSON.stringify(lsList().filter(r => r.id !== ride.id).concat(ride)));
+        return true;
+      } catch (e) { return false; }
+    }),
+    all: () => run(async db => (await asPromise(db.transaction('rides').objectStore('rides').getAll())).sort(byNewest),
+      () => lsList().sort(byNewest)),
+    samples: id => run(async db => unpackSamples((await asPromise(db.transaction('samples').objectStore('samples').get(id))) || []),
+      () => { try { return unpackSamples(JSON.parse(localStorage.getItem(LS_S + id) || '[]')); } catch (e) { return []; } }),
+    del: id => run(async db => {
+      const tx = db.transaction(['rides', 'samples'], 'readwrite');
+      tx.objectStore('rides').delete(id); tx.objectStore('samples').delete(id);
+      await done(tx);
+    }, () => {
+      try { localStorage.removeItem(LS_S + id); localStorage.setItem(LS_LIST, JSON.stringify(lsList().filter(r => r.id !== id))); } catch (e) { /* ignore */ }
+    }),
+    clear: () => run(async db => {
+      const tx = db.transaction(['rides', 'samples'], 'readwrite');
+      tx.objectStore('rides').clear(); tx.objectStore('samples').clear();
+      await done(tx);
+    }, () => {
+      try { lsList().forEach(r => localStorage.removeItem(LS_S + r.id)); localStorage.removeItem(LS_LIST); } catch (e) { /* ignore */ }
+    })
+  };
+})();
+
+// Newest-first list of saved rides, kept in memory for the Library "Suggested" badge.
+async function refreshHistory() {
+  try { ui.history = await RideStore.all(); } catch (e) { ui.history = []; }
+}
+
+// ---------------------------------------------------------------------------
+// Voice and beeps. Audio is off when ?speed= is used, but in test mode we still
+// log what would have been said / beeped so the e2e test can look at it.
+// ---------------------------------------------------------------------------
+const testLog = { spoken: [], beeps: 0 };
+let audioCtx = null;
+function getAudio() {
+  if (!audioCtx) { const AC = window.AudioContext || window.webkitAudioContext; if (AC) audioCtx = new AC(); }
+  return audioCtx;
+}
+// iOS only allows sound after a tap, so the Start tap unlocks both engines.
+function unlockAudio() {
+  if (SPEED !== 1) return;
+  try { if ('speechSynthesis' in window) speechSynthesis.speak(new SpeechSynthesisUtterance(' ')); } catch (e) { /* ignore */ }
+  try { const a = getAudio(); if (a && a.resume) a.resume(); } catch (e) { /* ignore */ }
+}
+function say(text) {
+  if (TESTING) testLog.spoken.push(text);
+  if (!state.settings.voice || SPEED !== 1) return;
+  try {
+    if (!('speechSynthesis' in window)) return;
+    speechSynthesis.cancel();                       // drop anything still queued
+    const u = new SpeechSynthesisUtterance(text);
+    u.rate = 1.0;
+    speechSynthesis.speak(u);
+  } catch (e) { /* ignore */ }
+}
+function beep() {                                   // 880 Hz for 80 ms
+  if (TESTING) testLog.beeps++;
+  if (!state.settings.beeps || SPEED !== 1) return;
+  try {
+    const a = getAudio();
+    if (!a) return;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = 'sine'; o.frequency.value = 880; g.gain.value = 0.25;
+    o.connect(g); g.connect(a.destination);
+    o.start(); o.stop(a.currentTime + 0.08);
+  } catch (e) { /* ignore */ }
+}
+function sayDur(sec) {
+  sec = Math.round(sec);
+  const h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+  const part = (n, w) => n + ' ' + w + (n === 1 ? '' : 's');
+  return [h && part(h, 'hour'), m && part(m, 'minute'), s && part(s, 'second')].filter(Boolean).join(' ') || '0 seconds';
+}
+
+// ---------------------------------------------------------------------------
+// Drivers. Common interface:
+//   connect() / disconnect() / setTargetPower(w) / setSim({grade}) / start()
+//   on('data', fn)   fn({power, cadence, hr, ...})
+//   on('status', fn) fn(text, {action?})        name
+// ---------------------------------------------------------------------------
+class Emitter {
+  constructor() { this._h = {}; }
+  on(evt, fn) { (this._h[evt] = this._h[evt] || []).push(fn); return this; }
+  emit(evt, ...args) { for (const fn of (this._h[evt] || [])) { try { fn(...args); } catch (e) { console.error(e); } } }
+}
+
+// Shared Web Bluetooth plumbing: pick a device, connect, and win it back after a drop.
+class BleDevice extends Emitter {
+  constructor(label) {
+    super();
+    this.label = label; this.name = ''; this.device = null; this.server = null;
+    this.state = 'idle';                  // idle | connecting | connected | reconnecting | lost
+    this._manual = false; this._looping = false;
+    this._chain = Promise.resolve();      // GATT operations run strictly one after another
+  }
+  note(text, opts) { this.emit('status', text, opts || {}); }
+  // Promise queue. The chain itself never rejects, so one failed write cannot jam the rest.
+  _enqueue(task) {
+    const p = this._chain.then(task);
+    this._chain = p.then(() => {}, () => {});
+    return p;
+  }
+  async connect() {
+    this._manual = false; this.state = 'connecting';
+    try {
+      this.device = await this._request();                      // throws if the person cancels the picker
+      this.name = this.device.name || this.label;
+      this.device.addEventListener('gattserverdisconnected', () => this._dropped());
+      await this._enqueue(() => this._open());
+      this.state = 'connected';
+      this._opened();
+    } catch (e) {
+      this.state = 'idle'; this._manual = true;                 // setup failed halfway: let go of the device
+      try { if (this.device && this.device.gatt.connected) this.device.gatt.disconnect(); } catch (e2) { /* ignore */ }
+      throw e;
+    }
+  }
+  disconnect() {
+    this._manual = true; this.state = 'idle';
+    this._closed();
+    try { if (this.device && this.device.gatt.connected) this.device.gatt.disconnect(); } catch (e) { /* ignore */ }
+  }
+  _dropped() { if (!this._manual) this.reconnect(); }
+  // Up to 10 tries, 2 s apart. The workout clock keeps running meanwhile.
+  async reconnect() {
+    if (this._looping || !this.device) return;
+    this._looping = true; this._manual = false; this.state = 'reconnecting';
+    this.note(this.label + ' disconnected, reconnecting…');
+    for (let i = 0; i < 10 && !this._manual; i++) {
+      await sleep(2000);
+      try {
+        await this._enqueue(() => this._open());
+        this.state = 'connected'; this._looping = false;
+        this.note(this.label + ' reconnected');
+        this._opened(true);
+        return;
+      } catch (e) { /* try again */ }
+    }
+    this._looping = false;
+    if (this._manual) return;
+    this.state = 'lost';
+    this.note(this.label + ' lost. Tap Reconnect.', { action: 'reconnect', who: this.who });
+  }
+  _opened() {}
+  _closed() {}
+}
+
+class BleTrainer extends BleDevice {
+  constructor() {
+    super('Trainer');
+    this.who = 'trainer';
+    this.cp = null; this.bike = null; this.powerOnly = false;
+    this._waiters = new Map();            // request opcode -> resolver for the control point reply
+    this._last = null;                    // last command {tag, bytes}: replayed on keepalive / reconnect
+    this._next = null; this._flushQueued = false; this._keep = null;
+    this._onCP = ev => this._handleCP(ev.target.value);
+    this._onBike = ev => { try { this.emit('data', C.parseIndoorBikeData(ev.target.value)); } catch (e) { /* ignore */ } };
+    this._onPower = ev => { try { this.emit('data', C.parseCyclingPower(ev.target.value)); } catch (e) { /* ignore */ } };
+  }
+  _request() {
+    return navigator.bluetooth.requestDevice({
+      filters: [{ services: [UUIDS.FTMS] }],
+      optionalServices: [UUIDS.HRS, UUIDS.CPS, UUIDS.BATTERY, UUIDS.DEV_INFO]
+    });
+  }
+  // Steps 2-5 of the connection sequence. Each await finishes before the next GATT call starts.
+  async _open() {
+    this.server = await this.device.gatt.connect();
+    let svc = null, bike = null, cp = null;
+    try { svc = await this.server.getPrimaryService(UUIDS.FTMS); } catch (e) { svc = null; }
+    if (svc) {
+      try { bike = await svc.getCharacteristic(UUIDS.INDOOR_BIKE); } catch (e) { bike = null; }
+      try { cp = await svc.getCharacteristic(UUIDS.CONTROL_PT); } catch (e) { cp = null; }
+    }
+    this.cp = cp; this.bike = bike;
+    // 3. Listen for control point replies first, then for bike data.
+    if (cp) {
+      cp.addEventListener('characteristicvaluechanged', this._onCP);
+      try { await cp.startNotifications(); } catch (e) { this.note('Could not listen to the trainer’s control point.'); }
+    }
+    if (bike) {
+      bike.addEventListener('characteristicvaluechanged', this._onBike);
+      await bike.startNotifications();
+    } else {
+      await this._openPowerMeter();       // 9. no bike data: power-only fallback
+    }
+    if (!cp) return;
+    // 4. Request control, wait up to 3 s for the reply.
+    const reply = this._expect(0x00, 3000);
+    await this._rawWrite(C.encRequestControl());
+    const r = await reply;
+    if (r === null) this.note('The trainer did not answer the control request. Carrying on anyway.');
+    else if (r.result === C.CP_RESULT.NOT_PERMITTED) this.note('Another app has control of the trainer. Close the Wahoo app / Zwift, turn the trainer off and on, then reconnect.');
+    // 5. Start (result ignored).
+    try { await this._rawWrite(C.encStart()); } catch (e) { /* ignore */ }
+  }
+  async _openPowerMeter() {
+    try {
+      const svc = await this.server.getPrimaryService(UUIDS.CPS);
+      const ch = await svc.getCharacteristic(UUIDS.CP_MEAS);
+      ch.addEventListener('characteristicvaluechanged', this._onPower);
+      await ch.startNotifications();
+      this.powerOnly = true;
+      this.note('This trainer only reports power, so the app cannot set the watts.');
+    } catch (e) { throw new Error('This trainer does not share power data.'); }
+  }
+  _expect(op, ms) {                       // resolves with the parsed reply, or null on timeout
+    return new Promise(resolve => {
+      const timer = setTimeout(() => { this._waiters.delete(op); resolve(null); }, ms);
+      this._waiters.set(op, r => { clearTimeout(timer); this._waiters.delete(op); resolve(r); });
+    });
+  }
+  _handleCP(dv) {
+    try {
+      const r = C.parseControlPointResponse(dv);
+      const w = this._waiters.get(r.requestOpcode);
+      if (w) w(r);
+    } catch (e) { /* ignore */ }
+  }
+  async _rawWrite(bytes) {
+    const ch = this.cp;
+    if (!ch) throw new Error('no control point');
+    if (typeof ch.writeValueWithResponse === 'function') await ch.writeValueWithResponse(bytes);
+    else await ch.writeValue(bytes);
+  }
+  // Newest command wins: while one is waiting in the queue, a newer one replaces it.
+  _send(tag, bytes) {
+    this._last = { tag, bytes };
+    if (this.state !== 'connected' || !this.cp) return;     // replayed once we are back
+    this._next = this._last;
+    if (this._flushQueued) return;
+    this._flushQueued = true;
+    this._enqueue(async () => {
+      this._flushQueued = false;
+      const cmd = this._next; this._next = null;
+      if (!cmd) return;
+      try { await this._rawWrite(cmd.bytes); } catch (e) { this.note('Trainer write failed: ' + ((e && e.message) || e)); }
+    }).catch(() => {});
+  }
+  setTargetPower(w) { this._send('erg', C.encSetTargetPower(w)); }
+  setSim(o) { this._send('sim', C.encSetSim(o)); }
+  start() {
+    if (this.state !== 'connected' || !this.cp) return;
+    this._enqueue(async () => { try { await this._rawWrite(C.encStart()); } catch (e) { /* ignore */ } }).catch(() => {});
+  }
+  _opened(again) {
+    if (!this._keep) this._keep = setInterval(() => { if (this._last) this._send(this._last.tag, this._last.bytes); }, 10000);   // keepalive
+    if (again && this._last) this._send(this._last.tag, this._last.bytes);                                                       // re-send target/sim
+  }
+  _closed() { clearInterval(this._keep); this._keep = null; }
+}
+
+class BleHeartRate extends BleDevice {
+  constructor() {
+    super('Heart rate');
+    this.who = 'hrm';
+    this._onHr = ev => { try { const b = C.parseHeartRate(ev.target.value); if (b != null) this.emit('data', { hr: b }); } catch (e) { /* ignore */ } };
+  }
+  _request() { return navigator.bluetooth.requestDevice({ filters: [{ services: [UUIDS.HRS] }] }); }
+  async _open() {
+    this.server = await this.device.gatt.connect();
+    const svc = await this.server.getPrimaryService(UUIDS.HRS);
+    const ch = await svc.getCharacteristic(UUIDS.HR_MEAS);
+    ch.addEventListener('characteristicvaluechanged', this._onHr);
+    await ch.startNotifications();
+  }
+}
+
+// Small seeded random generator, so the demo trainer behaves the same every run.
+function mulberry32(a) {
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+// Demo trainer (?sim=1). The engine calls step() once per workout second, so samples line up.
+class SimTrainer extends Emitter {
+  constructor() {
+    super();
+    this.name = 'Demo trainer'; this.state = 'connected';
+    this.mode = 'erg'; this.target = 0; this.grade = 0;
+    this.p = 0; this.hr = 62; this.cad = 88;
+    this.t = 0; this.log = [];                         // every command received, with the ride second
+    this._rnd = mulberry32(2026);
+  }
+  async connect() { this.note('Demo trainer ready'); }
+  disconnect() {}
+  note(t) { this.emit('status', t, {}); }
+  setClock(s) { this.t = s; }
+  setTargetPower(w) { this.mode = 'erg'; this.target = w; this.log.push({ t: this.t, kind: 'erg', value: w }); }
+  setSim(o) { this.mode = 'sim'; this.grade = (o && o.grade) || 0; this.log.push({ t: this.t, kind: 'sim', value: this.grade }); }
+  start() {}
+  step() {
+    const noise = amp => (this._rnd() * 2 - 1) * amp;
+    let want = this.mode === 'sim' ? 120 + 40 * this.grade : this.target;
+    const amp = this.mode === 'sim' ? 10 : 8;
+    // ?simFail: once the target reaches the limit, cadence falls 10 rpm/s to 0 and power follows it down.
+    if (SIM_FAIL && this.mode === 'erg' && this.target >= SIM_FAIL) this.cad = Math.max(0, this.cad - 10);
+    else this.cad = 88;
+    want = want * (this.cad / 88);
+    this.p += (want - this.p) * (1 - Math.exp(-1 / 2));                       // 2-second lag
+    this.hr += (60 + 0.45 * this.p - this.hr) * (1 - Math.exp(-1 / 20));      // 20-second lag
+    const cadence = this.cad === 88 ? Math.round(88 + noise(3)) : this.cad;
+    this.emit('data', { power: Math.max(0, Math.round(this.p + noise(amp))), cadence, hr: Math.round(this.hr) });
+  }
+}
+
+// "Ride without trainer": the clock runs, nothing is sent or recorded.
+class NullTrainer extends Emitter {
+  constructor() { super(); this.name = 'No trainer'; this.state = 'connected'; }
+  async connect() {}
+  disconnect() {}
+  setTargetPower() {}
+  setSim() {}
+  start() {}
+}
+
+// ---------------------------------------------------------------------------
+// Live data
+// ---------------------------------------------------------------------------
+function onTrainerData(d) {
+  const L = state.live, now = performance.now();
+  if (d.power != null) { L.power = d.power; L.recent.push(d.power); if (L.recent.length > 3) L.recent.shift(); }
+  if (d.cadence != null) L.cadence = d.cadence;
+  if (d.hr != null && !state.hrm) { L.hr = d.hr; L.hrAt = now; }
+  L.lastDataAt = now;
+}
+function onHrData(d) { state.live.hr = d.hr; state.live.hrAt = performance.now(); }
+// Seconds since data last arrived, measured on the ride clock (so ?speed= tests stay consistent).
+const ageOf = t => (t > 0 ? (performance.now() - t) * SPEED / 1000 : Infinity);
+const avg3 = () => {
+  const L = state.live;
+  return ageOf(L.lastDataAt) <= 3 && L.recent.length ? L.recent.reduce((a, b) => a + b, 0) / L.recent.length : null;
+};
+const lightWatts = () => (state.ftp ? Math.round(0.4 * state.ftp) : 80);
+const safe = fn => { try { return fn(); } catch (e) { console.error(e); } };
+
+let toastTimer = null;
+function toast(text, opts) {
+  opts = opts || {};
+  const el = $('toast');
+  const sticky = opts.action === 'reconnect';
+  el.innerHTML = '<span>' + esc(text) + '</span>' +
+    (sticky ? '<button class="btn" data-act="reconnect" data-who="' + esc(opts.who || 'trainer') + '">Reconnect</button>' : '');
+  el.hidden = false;
+  clearTimeout(toastTimer);
+  if (!sticky) toastTimer = setTimeout(() => { el.hidden = true; }, opts.ms || 7000);
+}
+
+function wire(dev) {
+  dev.on('data', dev instanceof BleHeartRate ? onHrData : onTrainerData);
+  dev.on('status', (text, opts) => {
+    state.status = text; toast(text, opts);
+    if (state.screen === 'connect') render();
+  });
+}
+const friendly = e => (e && e.name === 'NotFoundError' ? 'No device was chosen.' : 'Could not connect: ' + ((e && e.message) || e));
+
+async function connectTrainer() {
+  if (!HAS_BT) return;
+  if (state.trainer && state.trainer.disconnect) safe(() => state.trainer.disconnect());
+  const t = new BleTrainer(); wire(t);
+  state.status = 'Pick your trainer in the Bluetooth list…'; render();
+  try { await t.connect(); state.trainer = t; state.status = 'Connected to ' + t.name + '.'; }
+  catch (e) { state.trainer = null; state.status = friendly(e); }
+  render();
+}
+async function connectHrm() {
+  if (!HAS_BT) return;
+  if (state.hrm) safe(() => state.hrm.disconnect());
+  const h = new BleHeartRate(); wire(h);
+  state.status = 'Pick your heart rate strap in the Bluetooth list…'; render();
+  try { await h.connect(); state.hrm = h; state.status = 'Heart rate: ' + h.name + '.'; }
+  catch (e) { state.hrm = null; state.status = friendly(e); }
+  render();
+}
+function useDemo() {
+  const t = new SimTrainer(); wire(t);
+  state.trainer = t; state.status = 'Demo trainer ready.'; render();
+}
+function useNoTrainer() { state.trainer = new NullTrainer(); startFlow(ui.workoutId); }
+
+// ---------------------------------------------------------------------------
+// Ride engine
+// ---------------------------------------------------------------------------
+function startFlow(id) {
+  const w = WK.find(x => x.id === id);
+  if (!w) return;
+  if (!state.trainer) { toast('Connect a trainer first.'); return; }
+  const f = flattenWorkout(w, state.ftp);
+  if (!state.ftp && f.kind !== 'ramp') { openSheet('needftp'); return; }     // targets are fractions of FTP
+  beginRide(w);
+}
+
+function beginRide(workout) {
+  const f = flattenWorkout(workout, state.ftp);
+  const r = state.ride = {
+    workout, kind: f.kind, segments: f.segments, duration: f.duration, ifEstimate: f.ifEstimate, tssEstimate: f.tssEstimate,
+    ftp: state.ftp, elapsed: 0, segIndex: -1, scale: ui.scale, grade: 0, paused: false,
+    samples: [], startedAt: Date.now(), rampTest: { failed: false, done: false, ftp: null, bestMinute: null, tooShort: false },
+    lastSec: -1, sentTarget: null, lowCad: 0, lastEase: -1e9, segSum: 0, segN: 0, finished: false, detector: C.rampFailureDetector()
+  };
+  ui.scale = 1; ui.armed = null;
+  state.summary = null;
+  state.live.recent = [];
+  unlockAudio(); acquireWake();
+  const tr = state.trainer;
+  safe(() => tr.start());
+  lastTick = performance.now();
+  advance(r);                                  // second 0: first target goes out immediately
+  state.screen = 'ride'; render();
+}
+
+let lastTick = performance.now();
+// Clock: elapsed grows by real time (performance.now deltas) x speed, only while running.
+function tick() {
+  const now = performance.now(), dt = now - lastTick;
+  lastTick = now;
+  const r = state.ride;
+  if (!r || r.finished || r.paused || state.screen !== 'ride') return;
+  r.elapsed += dt * SPEED / 1000;
+  advance(r);
+  if (state.screen === 'ride') updateRide();
+}
+setInterval(tick, 250);
+
+// Handle every whole second that has passed, one at a time, so a long tick (or ?speed=60)
+// still gives one sample per second and never skips a segment change.
+function advance(r) {
+  const upTo = Math.floor(r.elapsed);
+  while (r.lastSec < upTo && !r.finished) { r.lastSec++; secondTick(r, r.lastSec); }
+}
+
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const sentence = s => cap(s) + (/[.!?]$/.test(s) ? '' : '.');
+const isWork = seg => seg.label === 'Work' || seg.kind === 'free';
+
+function secondTick(r, s) {
+  const tr = state.trainer;
+  if (tr && tr.setClock) tr.setClock(s);
+  const seg = C.segmentAt(r.segments, s);
+  if (!seg) { finishRide(); return; }                       // past the end of the plan
+  if (seg.idx !== r.segIndex) enterSegment(r, seg, s);
+  const late = SPEED === 1 && r.elapsed - s > 2;              // catching up after a stall: skip beeps and prompts
+
+  let target = null;
+  if (seg.kind === 'ramptest') {
+    const t = s - seg.start;
+    target = pushTarget(r, s, false);
+    if (t > 0 && t % 60 === 0 && !late) say(String(target));  // each step: just the watts
+  } else if (seg.kind !== 'free') target = pushTarget(r, s, false);   // ramps re-send whenever the target moves 1 W
+
+  if (tr && tr.step) tr.step();                              // demo trainer: one data point per ride second
+  const sample = recordSample(r, s, target);
+  if (seg.kind === 'free' && sample.power != null) { r.segSum += sample.power; r.segN++; }
+
+  // Spoken and audible cues
+  const rem = seg.start + seg.dur - s;                       // seconds left, counting this one
+  const next = r.segments[seg.idx + 1];
+  if (!late) {
+    if (rem >= 1 && rem <= 3 && next && next.from > seg.to + 0.005) beep();          // 3-2-1 into a harder segment
+    if (rem === 10 && isWork(seg) && seg.dur >= 30) say('Ten seconds.');
+    if (seg.kind !== 'ramptest' && seg.dur >= 600 && s === seg.start + Math.floor(seg.dur / 2)) say('Halfway.');
+  }
+
+  if (seg.kind === 'ramptest') {
+    if (r.detector.feed({ t: s - seg.start, target, power: sample.power, cadence: sample.cadence })) finishRampTest(r, s, true);
+  } else if (state.settings.autoEase && seg.kind === 'erg' && seg.from >= 0.85 && sample.power != null && sample.cadence != null) {
+    r.lowCad = sample.cadence < 55 ? r.lowCad + 1 : 0;       // auto-ease: cadence under 55 for 8 s in a row
+    if (r.lowCad >= 8 && s - r.lastEase >= 30) {
+      r.scale = clamp(round2(r.scale - 0.05), 0.5, 1.5); r.lastEase = s; r.lowCad = 0;
+      say('Easing 5 percent'); pushTarget(r, s, true);
+    }
+  } else r.lowCad = 0;
+}
+
+// Send the wanted watts if they changed (or force). Returns the target, null in free segments.
+function pushTarget(r, s, force) {
+  const seg = C.segmentAt(r.segments, s);
+  if (!seg || seg.kind === 'free') return null;
+  const w = targetAt(r.segments, s, r.ftp || 100, r.scale);      // ramp-test cooldown has no FTP: fractions are against 100
+  if (w == null) return null;
+  if (force || w !== r.sentTarget) { r.sentTarget = w; safe(() => state.trainer.setTargetPower(w)); }
+  return w;
+}
+
+function recordSample(r, s, target) {
+  const L = state.live, fresh = ageOf(L.lastDataAt) <= 3, hrFresh = ageOf(L.hrAt) <= 3;
+  const sample = {
+    t: s, target,
+    power: fresh && L.power != null ? L.power : null,
+    cadence: fresh && L.cadence != null ? L.cadence : null,
+    hr: hrFresh && L.hr != null ? L.hr : null
+  };
+  r.samples.push(sample);
+  return sample;
+}
+
+function announce(r, seg, w) {
+  if (seg.kind === 'ramptest') return 'Ramp test. Start at ' + w + ' watts.';
+  const cue = seg.cue ? ' ' + sentence(seg.cue) : '';
+  if (seg.rest) return 'Easy, ' + sayDur(seg.dur) + '.' + cue;
+  if (seg.kind === 'ramp') {
+    const f = (r.ftp || 100) * r.scale, a = Math.round(seg.from * f), b = Math.round(seg.to * f);
+    return sayDur(seg.dur) + (b >= a ? ', building from ' : ', easing from ') + a + ' to ' + b + ' watts.' + cue;
+  }
+  return sayDur(seg.dur) + ' at ' + w + ' watts.' + cue;
+}
+
+function enterSegment(r, seg, s) {
+  r.segIndex = seg.idx; r.sentTarget = null; r.segSum = 0; r.segN = 0;
+  if (seg.kind === 'free') {
+    r.grade = seg.grade;
+    safe(() => state.trainer.setSim({ grade: r.grade }));
+    say(seg.cue ? sentence(seg.cue) : 'Free ride, ' + sayDur(seg.dur) + '.');
+    return;
+  }
+  const w = pushTarget(r, s, true);
+  if (!seg.quiet) say(announce(r, seg, w));
+}
+
+// ---- ramp test ----
+function scoreRampTest(r, secondsRidden) {
+  const res = C.rampResult(r.samples), rt = r.rampTest;
+  rt.done = true; rt.bestMinute = res.bestMinute;
+  rt.tooShort = secondsRidden < 300 || res.ftp == null;       // under 5 minutes: no FTP
+  rt.ftp = rt.tooShort ? null : res.ftp;
+}
+// Failure or "I'm done" at second s: score it, then rewrite the plan in place (test stops here, 5 min cooldown follows).
+function finishRampTest(r, s, failed) {
+  const seg = r.segments[r.segIndex];
+  const ridden = s + 1 - seg.start;
+  scoreRampTest(r, ridden);
+  r.rampTest.failed = failed;
+  say(r.rampTest.tooShort ? 'Too short to score.' : 'Done. Your FTP is ' + r.rampTest.ftp + '.');
+  if (!r.ftp && r.rampTest.ftp) r.ftp = r.rampTest.ftp;        // from here on the plan is in terms of the new FTP
+  const base = r.rampTest.ftp || r.ftp;
+  const watts = base ? Math.max(60, Math.round(0.4 * base)) : 80;
+  const frac = watts / (r.ftp || 100);                          // (still no FTP at all: fractions are against 100)
+  seg.dur = ridden;
+  r.segments.push({ idx: r.segments.length, start: seg.start + ridden, dur: 300, kind: 'erg', from: frac, to: frac, cue: null,
+    zone: zoneOf(0.4), label: 'Cool-down', rest: true, quiet: true });   // quiet: do not talk over "Done. Your FTP is ..."
+  r.duration = seg.start + ridden + 300;
+}
+
+// ---- buttons ----
+function adjustScale(d) {
+  const r = state.ride;
+  if (!r || r.finished) return;
+  r.scale = clamp(round2(r.scale + d), 0.5, 1.5);
+  scheduleSend(); updateRide();
+}
+function adjustGrade(d) {
+  const r = state.ride;
+  if (!r || r.finished) return;
+  r.grade = clamp(round2(r.grade + d), -10, 20);
+  scheduleSend(); updateRide();
+}
+let sendTimer = null;
+function scheduleSend() {                                    // debounce trainer writes by 300 ms
+  clearTimeout(sendTimer);
+  sendTimer = setTimeout(() => { const r = state.ride; if (r && !r.finished && !r.paused) sendNow(r); }, 300);
+}
+function sendNow(r) {
+  const seg = C.segmentAt(r.segments, Math.max(0, r.lastSec));
+  if (seg && seg.kind === 'free') safe(() => state.trainer.setSim({ grade: r.grade }));
+  else pushTarget(r, Math.max(0, r.lastSec), true);
+}
+function togglePause() {
+  const r = state.ride;
+  if (!r || r.finished) return;
+  r.paused = !r.paused;
+  if (r.paused) safe(() => state.trainer.setTargetPower(lightWatts()));   // pedals go light
+  else sendNow(r);                                                          // back to the real target
+  lastTick = performance.now();
+  updateRide();
+}
+function skipSegment() {
+  const r = state.ride;
+  if (!r || r.finished) return;
+  const seg = r.segments[r.segIndex];
+  if (seg.kind === 'ramptest') { finishRampTest(r, r.lastSec, false); return; }   // "I'm done"
+  if (seg.idx >= r.segments.length - 1) return;
+  // Cut this segment short and close the gap, so the timeline stays continuous.
+  const newDur = r.lastSec + 1 - seg.start, cut = seg.dur - newDur;
+  if (cut <= 0) return;
+  seg.dur = newDur;
+  for (let j = seg.idx + 1; j < r.segments.length; j++) r.segments[j].start -= cut;
+  r.duration -= cut;
+  updateRide();
+}
+
+// ---- finishing ----
+function twentyMinuteFtp(r) {
+  const seg = C.twentyMinuteEffort(r.segments);
+  if (!seg) return null;
+  const inside = r.samples.filter(s => s.t >= seg.start && s.t < seg.start + seg.dur);
+  if (inside.length < 1140) return null;                     // effort was cut short
+  return Math.round(0.95 * inside.reduce((a, s) => a + (s.power || 0), 0) / inside.length);
+}
+function makeProposal(r, m) {
+  if (r.kind === 'ramp') return r.rampTest.ftp ? { ftp: r.rampTest.ftp, kind: 'ramp' } : null;     // a test always proposes
+  if (r.kind === '20min') { const f = twentyMinuteFtp(r); return f ? { ftp: f, kind: '20min' } : null; }
+  if (m.eftp && (!state.ftp || m.eftp >= 1.02 * state.ftp)) return { ftp: m.eftp, kind: 'auto' };    // never auto-lower
+  return null;
+}
+
+function finishRide() {
+  const r = state.ride;
+  if (!r || r.finished) return;
+  r.finished = true;
+  clearTimeout(sendTimer);
+  safe(() => state.trainer.setTargetPower(lightWatts()));
+  releaseWake();
+  try { if ('speechSynthesis' in window && SPEED === 1) speechSynthesis.cancel(); } catch (e) { /* ignore */ }
+  if (r.kind === 'ramp' && !r.rampTest.done) scoreRampTest(r, r.samples.length);   // ended by End, or ran out of plan
+  const ftpUsed = r.ftp || r.rampTest.ftp || state.ftp || null;
+  const m = computeMetrics(r.samples, ftpUsed, { isRampTest: r.kind === 'ramp' });
+  const proposal = makeProposal(r, m);
+  const rec = {
+    id: r.startedAt, startedAt: r.startedAt, workoutId: r.workout.id, name: r.workout.name, cat: r.workout.cat, kind: r.kind,
+    ftp: ftpUsed, duration: m.duration, plannedTss: r.tssEstimate,
+    segments: r.segments.map(s => ({ start: s.start, dur: s.dur, kind: s.kind, from: s.from, to: s.to })),
+    m: { avgPower: m.avgPower, maxPower: m.maxPower, avgCadence: m.avgCadence, avgHr: m.avgHr, maxHr: m.maxHr, kj: m.kj,
+         np: m.np, if: m.if, tss: m.tss, best: m.best, eftp: proposal ? proposal.ftp : (r.kind === 'ramp' ? null : m.eftp) }
+  };
+  state.summary = { rec, samples: r.samples, metrics: m, proposal, fresh: true };
+  state.screen = 'summary';
+  RideStore.put(rec, r.samples).then(ok => { if (!ok) toast('This ride could not be saved on this device. Export it now.'); return refreshHistory(); }).catch(() => {});
+  render();
+}
+
+// ---- keep the screen awake ----
+let wake = null;
+async function acquireWake() {
+  ui.noWake = false;
+  if (!state.settings.keepAwake) return;
+  try {
+    if (navigator.wakeLock && navigator.wakeLock.request) wake = await navigator.wakeLock.request('screen');
+    else ui.noWake = true;
+  } catch (e) { /* the request can be refused; try again on the next visibilitychange */ }
+}
+function releaseWake() { try { if (wake) wake.release(); } catch (e) { /* ignore */ } wake = null; }
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible' && state.screen === 'ride' && state.ride && !state.ride.finished) acquireWake();
+});
+
+// ---------------------------------------------------------------------------
+// Views. Each screen is a function returning HTML; buttons carry data-act and one
+// delegated click handler (bottom of the file) routes them. No text inputs anywhere.
+// ---------------------------------------------------------------------------
+const FLAT = {};                                   // workout id -> flattened plan (IF/TSS do not depend on FTP)
+for (const w of WK) FLAT[w.id] = flattenWorkout(w, null);
+
+let shownScreen = null;
+function render() {
+  const y = window.scrollY;
+  document.body.classList.toggle('riding', state.screen === 'ride');
+  $('screen').innerHTML = VIEWS[state.screen]();
+  if (state.screen !== shownScreen) window.scrollTo(0, 0); else window.scrollTo(0, y);
+  shownScreen = state.screen;
+  if (state.screen === 'ride') { ui.profSig = null; updateRide(); }
+  renderSheet();
+}
+function go(screen) { ui.armed = null; state.screen = screen; render(); }
+const refresh = () => (state.screen === 'ride' ? updateRide() : render());
+let armTimer = null;
+function arm(key) {                                // two-tap confirm: first tap arms for 4 seconds
+  ui.armed = key; clearTimeout(armTimer);
+  armTimer = setTimeout(() => { if (ui.armed === key) { ui.armed = null; refresh(); } }, 4000);
+  refresh();
+}
+
+// ---- sheets (Set FTP first / set by hand) ----
+function openSheet(kind) { ui.sheet = kind; if (kind === 'needftp') ui.handFtp = 200; renderSheet(); }
+function closeSheet() { ui.sheet = null; renderSheet(); }
+function renderSheet() {
+  const el = $('sheet');
+  if (!ui.sheet) { el.hidden = true; el.innerHTML = ''; return; }
+  let h = '';
+  if (ui.sheet === 'needftp') {
+    h = '<h2>Set FTP first</h2><p class="muted">Every workout is a percentage of your FTP.</p><div class="stack">' +
+      '<button class="btn primary wide" data-act="sheet-ramp">Ramp Test</button>' +
+      '<button class="btn wide" data-act="sheet-hand">Set it by hand</button>' +
+      '<button class="btn link wide" data-act="sheet-close">Cancel</button></div>';
+  } else if (ui.sheet === 'hand') {
+    h = '<h2>Set FTP</h2><div class="stack"><div class="stepper">' +
+      [-10, -1].map(d => '<button class="btn" data-act="hand" data-d="' + d + '">−' + (-d) + '</button>').join('') +
+      '<div class="val">' + ui.handFtp + '</div>' +
+      [1, 10].map(d => '<button class="btn" data-act="hand" data-d="' + d + '">+' + d + '</button>').join('') + '</div>' +
+      '<button class="btn primary wide" data-act="sheet-use">Use ' + ui.handFtp + '</button>' +
+      '<button class="btn link wide" data-act="sheet-close">Cancel</button></div>';
+  }
+  el.innerHTML = '<div class="box">' + h + '</div>';
+  el.hidden = false;
+}
+
+// ---- profile drawing: bars coloured by zone, height by percent of FTP ----
+function profileSVG(segments, o) {
+  o = o || {};
+  const total = segments.reduce((a, s) => Math.max(a, s.start + s.dur), 0) || 1;
+  const W = 1000, H = 100;
+  const peak = o.ymax || Math.max(1, ...segments.map(s => Math.max(s.from, s.to))) * 1.08;
+  const y = p => (H - Math.min(1, p / peak) * (H - 4)).toFixed(1);
+  const x = t => (t / total * W).toFixed(1);
+  const bars = segments.map(s => {
+    const col = s.kind === 'free' ? '#5a6672' : zoneOf((s.from + s.to) / 2).color;
+    const x0 = x(s.start), x1 = x(s.start + s.dur);
+    return '<polygon points="' + x0 + ',' + H + ' ' + x0 + ',' + y(s.from) + ' ' + x1 + ',' + y(s.to) + ' ' + x1 + ',' + H +
+      '" fill="' + col + '" stroke="#0e1115" stroke-width="1.5" vector-effect="non-scaling-stroke"/>';
+  }).join('');
+  const cursor = o.cursor ? '<rect id="cursor" x="0" y="0" width="6" height="' + H + '" fill="#fff"/>' : '';
+  return '<svg class="prof' + (o.big ? ' big' : '') + '" viewBox="0 0 ' + W + ' ' + H + '" preserveAspectRatio="none" aria-hidden="true">' + bars + cursor + '</svg>';
+}
+
+// ---- Connect ----
+function viewConnect() {
+  const t = state.trainer;
+  const note = !HAS_BT && !SIM
+    ? '<div class="note">This browser can’t do Bluetooth. On iPad use the free Bluefy browser; on a computer use Chrome or Edge.</div>' : '';
+  return '<div class="screen stack"><h1>ERG</h1>' +
+    '<p class="muted">Turn the trainer on and close the Wahoo app and Zwift first.</p>' + note +
+    (SIM ? '<button class="btn big primary" data-act="demo">Demo trainer</button>' : '') +
+    '<button class="btn big' + (SIM ? '' : ' primary') + '" data-act="connect-trainer"' + (HAS_BT ? '' : ' disabled') + '>Connect Trainer</button>' +
+    '<button class="btn wide" data-act="connect-hrm"' + (HAS_BT ? '' : ' disabled') + '>Connect Heart Rate (optional)</button>' +
+    '<div class="status" id="status">' + esc(state.status) + '</div>' +
+    (t ? '<div class="panel"><b>Trainer:</b> <span id="trainerName">' + esc(t.name) + '</span>' +
+         (state.hrm ? '<br><b>Heart rate:</b> ' + esc(state.hrm.name) : '') + '</div>' : '') +
+    '<button class="btn wide primary" data-act="go" data-to="library">Continue</button></div>';
+}
+
+// ---- Library ----
+const DUR_CHIPS = [['le30', '≤30'], ['45', '45'], ['60', '60'], ['75', '75+']];
+const durBucket = sec => { const m = sec / 60; return m <= 30 ? 'le30' : m <= 52 ? '45' : m <= 67 ? '60' : '75'; };
+const isRampWk = w => FLAT[w.id].kind === 'ramp';
+function suggestedId() {
+  const hist = ui.history, s = state.ftpSource;
+  const dates = hist.filter(h => h.cat === 'test').map(h => h.startedAt);
+  if (s && (s.kind === 'ramp' || s.kind === '20min')) dates.push(s.date);
+  return C.suggestWorkoutId({ ftp: state.ftp, lastTestAt: dates.length ? Math.max(...dates) : null,
+    lastCat: hist[0] ? hist[0].cat : null, rideCount: hist.length, now: Date.now() });
+}
+function wkMeta(w) {
+  const f = FLAT[w.id], ok = state.ftp && !isRampWk(w);
+  return '<span><b>' + (isRampWk(w) ? '15–25 min' : fmtHM(f.duration)) + '</b></span>' +
+    '<span>IF <b>' + (ok ? f.ifEstimate.toFixed(2) : '—') + '</b></span>' +
+    '<span>TSS <b>' + (ok ? Math.round(f.tssEstimate) : '—') + '</b></span>';
+}
+function viewLibrary() {
+  const sug = suggestedId();
+  const list = WK.filter(w => (ui.cat === 'all' || w.cat === ui.cat) && (!ui.dur || durBucket(FLAT[w.id].duration) === ui.dur));
+  const chip = (act, v, label, on) => '<button class="chip' + (on ? ' on' : '') + '" data-act="' + act + '" data-v="' + v + '">' + esc(label) + '</button>';
+  const cards = list.map(w =>
+    '<button class="wk" data-act="open" data-id="' + w.id + '">' +
+    (w.id === sug ? '<span class="badge sug">Suggested</span>' : '') +
+    '<h3>' + esc(w.name) + '</h3><div class="meta">' + wkMeta(w) + '</div><p>' + esc(w.desc) + '</p>' +
+    profileSVG(FLAT[w.id].segments, { ymax: 1.6 }) + '</button>').join('');
+  return '<div class="screen"><div class="topbar"><h1>ERG</h1><div class="row">' +
+    '<button class="btn small" data-act="go" data-to="history">History</button>' +
+    '<button class="btn small" data-act="go" data-to="settings">Settings</button>' +
+    '<button class="btn small" data-act="go" data-to="connect">' + (state.trainer ? esc(state.trainer.name) : 'Connect') + '</button></div></div>' +
+    '<button class="btn link" id="ftpLine" data-act="go" data-to="settings" style="font-size:22px;min-height:48px">' + esc(ftpLine()) + '</button>' +
+    '<div class="chips">' + chip('cat', 'all', 'All', ui.cat === 'all') + CATS.map(c => chip('cat', c[0], c[1], ui.cat === c[0])).join('') + '</div>' +
+    '<div class="chips">' + DUR_CHIPS.map(c => chip('dur', c[0], c[1], ui.dur === c[0])).join('') + '</div>' +
+    '<div class="cards">' + (cards || '<p class="muted">No workouts match those filters.</p>') + '</div></div>';
+}
+
+// ---- Preview ----
+function viewPreview() {
+  const w = WK.find(x => x.id === ui.workoutId), f = FLAT[w.id], ramp = isRampWk(w);
+  const steps = C.describeWorkout(w, state.ftp).map(l => '<li>' + esc(l) + '</li>').join('');
+  const stepper = ramp ? '' : '<div class="panel row between"><span><b>Intensity</b> <span class="muted">(you can change it during the ride too)</span></span>' +
+    '<span class="stepper"><button class="btn" data-act="pre-scale" data-d="-0.05">−5%</button><span class="val" style="font-size:32px;min-width:90px">' +
+    Math.round(ui.scale * 100) + '%</span><button class="btn" data-act="pre-scale" data-d="0.05">+5%</button></span></div>';
+  const start = state.trainer
+    ? '<button class="btn big primary" data-act="start">Start</button>'
+    : '<button class="btn big" disabled>Start</button><p class="status">Connect a trainer first.</p>' +
+      '<button class="btn wide" data-act="go" data-to="connect">Connect trainer</button>' +
+      (SIM ? '' : '<button class="btn link" data-act="no-trainer" style="min-height:64px;font-size:16px">Ride without trainer</button>');
+  return '<div class="screen stack"><div class="topbar"><button class="btn small" data-act="go" data-to="library">‹ Library</button>' +
+    '<span class="muted">' + esc(ftpLine()) + '</span></div>' +
+    '<div><h1>' + esc(w.name) + '</h1><div class="row muted" style="font-size:22px"><span><b style="color:var(--text)">' +
+    (ramp ? '15–25 min' : fmtHM(f.duration)) + '</b></span>' +
+    (ramp ? '' : '<span>IF <b style="color:var(--text)">' + (state.ftp ? f.ifEstimate.toFixed(2) : '—') + '</b></span><span>TSS <b style="color:var(--text)">' +
+      (state.ftp ? Math.round(f.tssEstimate) : '—') + '</b></span>') + '</div></div>' +
+    '<p>' + esc(w.desc) + '</p>' + profileSVG(f.segments, { big: true }) +
+    '<ol class="steps">' + steps + '</ol>' + stepper + start + '</div>';
+}
+
+// ---- Ride: markup is built once; updateRide() only changes text and attributes ----
+function viewRide() {
+  return '<section class="ride" id="ride">' +
+    '<div class="r-top"><span class="name" id="rName"></span><span class="clock" id="rClock"></span><span class="badge" id="rBadge"></span></div>' +
+    '<div class="r-main"><div class="r-card"><div class="lbl">TARGET</div><div class="num" id="vT">—</div></div>' +
+    '<div class="r-card"><div class="lbl">POWER</div><div class="num" id="vP">—</div></div></div>' +
+    '<div class="r-sub"><div><span class="lbl">CADENCE</span><b id="vC">—</b> <small>rpm</small></div>' +
+    '<div><span class="lbl">HEART RATE</span><b id="vH">—</b> <small>bpm</small></div></div>' +
+    '<div class="r-int"><div class="t" id="vS">0:00</div><div class="n" id="vN"></div></div>' +
+    '<div class="r-prof" id="rProf"></div>' +
+    '<div class="r-btns"><button class="btn" id="bPause" data-act="pause">Pause</button>' +
+    '<button class="btn" id="bSkip" data-act="skip">Skip</button>' +
+    '<button class="btn" id="bM" data-act="scale" data-d="-0.05">−5%</button>' +
+    '<button class="btn" id="bP" data-act="scale" data-d="0.05">+5%</button>' +
+    '<button class="btn" id="bEnd" data-act="end">End</button></div>' +
+    '<div class="r-note note" id="rNote" hidden><span>Set Auto-Lock to Never in iPad Settings so the screen stays on</span>' +
+    '<button class="btn small" data-act="dismiss-note">OK</button></div></section>';
+}
+const setText = (id, t) => { const el = $(id); if (el && el.textContent !== String(t)) el.textContent = t; };
+
+function nextLabel(r, seg) {
+  const n = r.segments[seg.idx + 1];
+  if (!n) return 'Next: finish';
+  const f = (r.ftp || 100) * r.scale, d = fmtClock(n.dur);
+  if (n.kind === 'free') return 'Next: ' + d + ' free ride';
+  if (n.rest) return 'Next: ' + d + ' easy';
+  if (n.kind === 'ramp') return 'Next: ' + d + ' ' + Math.round(n.from * f) + '–' + Math.round(n.to * f) + ' W';
+  return 'Next: ' + d + ' @ ' + Math.round(n.from * f) + ' W';
+}
+
+function updateRide() {
+  const r = state.ride;
+  if (!r || !$('ride')) return;
+  const seg = r.segments[Math.max(0, r.segIndex)];
+  const isRamp = seg.kind === 'ramptest', isFree = seg.kind === 'free', L = state.live;
+  const ftp = r.ftp || state.ftp || 0;
+  const target = isFree ? null : targetAt(r.segments, Math.max(0, r.lastSec), r.ftp || 100, r.scale);
+  const zoneCol = target != null && ftp ? zoneOf(target / ftp).color : 'var(--text)';
+  const p = avg3();
+  const near = target != null && p != null && Math.abs(p - target) <= 0.05 * target;
+
+  setText('rName', r.workout.name + (r.paused ? ' · PAUSED' : ''));
+  setText('rClock', fmtClock(Math.floor(r.elapsed)) + (isRamp ? '' : ' / ' + fmtClock(r.duration)));
+  const badge = $('rBadge');
+  badge.hidden = isRamp;
+  setText('rBadge', isFree ? 'Grade ' + r.grade.toFixed(1) + '%' : Math.round(r.scale * 100) + '%');
+  setText('vT', target == null ? '—' : target); $('vT').style.color = zoneCol;
+  setText('vP', p == null ? '—' : Math.round(p)); $('vP').style.color = near ? zoneCol : 'var(--text)';
+  setText('vC', ageOf(L.lastDataAt) <= 3 && L.cadence != null ? Math.round(L.cadence) : '—');
+  setText('vH', ageOf(L.hrAt) <= 3 && L.hr != null ? Math.round(L.hr) : '—');
+
+  let remaining, next;
+  if (isRamp) {                                          // time to the next 20 W step
+    const t = r.elapsed - seg.start, k = Math.floor(t / 60);
+    remaining = Math.ceil(60 - (t - k * 60));
+    next = 'Next step: ' + C.rampTestTargetAt((k + 1) * 60) + ' W';
+  } else {
+    remaining = Math.max(0, Math.ceil(seg.start + seg.dur - r.elapsed));
+    next = nextLabel(r, seg);
+  }
+  setText('vS', fmtClock(remaining));
+  setText('vN', (isFree ? 'Average ' + (r.segN ? Math.round(r.segSum / r.segN) : '—') + ' W · ' : '') + next);
+
+  // buttons change with the segment type
+  setText('bPause', r.paused ? 'Resume' : 'Pause');
+  setText('bSkip', isRamp ? 'I’m done' : 'Skip');
+  $('bSkip').disabled = !isRamp && seg.idx >= r.segments.length - 1;
+  const bm = $('bM'), bp = $('bP');
+  bm.style.visibility = bp.style.visibility = isRamp ? 'hidden' : 'visible';
+  bm.dataset.act = bp.dataset.act = isFree ? 'grade' : 'scale';
+  bm.dataset.d = isFree ? '-0.5' : '-0.05'; bp.dataset.d = isFree ? '0.5' : '0.05';
+  setText('bM', isFree ? 'Grade −0.5' : '−5%'); setText('bP', isFree ? 'Grade +0.5' : '+5%');
+  setText('bEnd', ui.armed === 'end' ? 'End ride?' : 'End'); $('bEnd').classList.toggle('armed', ui.armed === 'end');
+  $('rNote').hidden = !(ui.noWake && !ui.noteDismissed && state.settings.keepAwake);
+
+  // profile along the bottom, with the progress cursor
+  const sig = r.segments.length + ':' + r.duration;
+  if (ui.profSig !== sig) { $('rProf').innerHTML = profileSVG(r.segments, { cursor: true }); ui.profSig = sig; }
+  const cur = $('cursor');
+  if (cur) cur.setAttribute('x', Math.min(994, Math.max(0, r.elapsed / r.duration * 1000)).toFixed(1));
+}
+
+// ---- Summary (used for a ride just finished, and for rides opened from History) ----
+function movingAvg(a, w) {
+  const out = []; let sum = 0;
+  for (let i = 0; i < a.length; i++) { sum += a[i]; if (i >= w) sum -= a[i - w]; out.push(sum / Math.min(w, i + 1)); }
+  return out;
+}
+function powerChart(rec, samples) {
+  const n = samples.length;
+  if (n < 2) return '';
+  const W = 1000, H = 300, padL = 50, padB = 24, plotW = W - padL - 8, plotH = H - padB - 10;
+  const total = Math.max(n, ...rec.segments.map(s => s.start + s.dur));
+  let peak = 0;
+  for (const s of samples) peak = Math.max(peak, s.power || 0, s.target || 0);
+  const maxW = Math.max(150, Math.ceil(peak * 1.1 / 50) * 50), gridStep = maxW > 400 ? 100 : 50;
+  const x = t => (padL + t / total * plotW).toFixed(1), y = w => (10 + plotH - Math.min(w, maxW) / maxW * plotH).toFixed(1);
+  let g = '';
+  for (let w = 0; w <= maxW; w += gridStep) {
+    g += '<line x1="' + padL + '" x2="' + (W - 8) + '" y1="' + y(w) + '" y2="' + y(w) + '" stroke="#252c34"/>' +
+         '<text x="' + (padL - 6) + '" y="' + (Number(y(w)) + 5) + '" fill="#8a94a0" font-size="14" text-anchor="end">' + w + '</text>';
+  }
+  const tickEvery = total > 1800 ? 600 : 300;
+  for (let t = 0; t <= total; t += tickEvery) {
+    g += '<text x="' + x(t) + '" y="' + (H - 6) + '" fill="#8a94a0" font-size="14" text-anchor="middle">' + Math.round(t / 60) + ' min</text>';
+  }
+  let plan = '';                                                  // planned profile behind the lines
+  if (rec.ftp) for (const s of rec.segments) {
+    if (s.kind === 'free' || s.kind === 'ramptest') continue;
+    plan += '<polygon points="' + x(s.start) + ',' + y(0) + ' ' + x(s.start) + ',' + y(s.from * rec.ftp) + ' ' + x(s.start + s.dur) + ',' + y(s.to * rec.ftp) +
+            ' ' + x(s.start + s.dur) + ',' + y(0) + '" fill="' + zoneOf((s.from + s.to) / 2).color + '" opacity=".28"/>';
+  }
+  const stride = Math.max(1, Math.floor(n / 600));
+  const line = (vals, color, width) => {                           // null breaks the line
+    let d = '', pen = false;
+    for (let i = 0; i < n; i += stride) {
+      if (vals[i] == null) { pen = false; continue; }
+      d += (pen ? 'L' : 'M') + x(samples[i].t != null ? samples[i].t : i) + ' ' + y(vals[i]); pen = true;
+    }
+    return '<path d="' + d + '" fill="none" stroke="' + color + '" stroke-width="' + width + '" stroke-linejoin="round"/>';
+  };
+  const power = movingAvg(samples.map(s => s.power || 0), 10);
+  return '<svg class="chart" viewBox="0 0 ' + W + ' ' + H + '" role="img" aria-label="Power against target">' + g + plan +
+    line(samples.map(s => s.target), '#8a94a0', 2) + line(power, '#ffffff', 2.5) +
+    '<text x="' + (W - 12) + '" y="22" fill="#fff" font-size="15" text-anchor="end">power (10 s avg)</text>' +
+    '<text x="' + (W - 12) + '" y="42" fill="#8a94a0" font-size="15" text-anchor="end">target</text></svg>';
+}
+
+function viewSummary() {
+  const S = state.summary;
+  if (!S) return '<div class="screen"><button class="btn" data-act="go" data-to="library">Library</button></div>';
+  const rec = S.rec, m = rec.m, p = S.proposal;
+  const num = (v, unit, d) => (v == null ? '—' : (d ? v.toFixed(d) : Math.round(v)) + (unit || ''));
+  const cells = [
+    ['Duration', fmtClock(rec.duration)], ['Avg power', num(m.avgPower, ' W')], ['NP', num(m.np, ' W')],
+    ['IF', num(m.if, '', 2)], ['TSS', '<span id="sTss" data-raw="' + (m.tss == null ? '' : m.tss) + '">' + num(m.tss) + '</span>'], ['Work', num(m.kj, ' kJ')],
+    ['Avg HR', num(m.avgHr, ' bpm')], ['Max HR', num(m.maxHr, ' bpm')],
+    ['Best 1 min', num(m.best.p60, ' W')], ['Best 5 min', num(m.best.p300, ' W')], ['Best 20 min', num(m.best.p1200, ' W')],
+    ['eFTP', '<span id="sEftp">' + num(m.eftp, ' W') + '</span>']
+  ].map(c => '<div class="stat"><small>' + c[0] + '</small><b>' + c[1] + '</b></div>').join('');
+  const tooShort = S.fresh && rec.kind === 'ramp' && state.ride && state.ride.rampTest.tooShort;
+  const prompt = S.fresh && p && !S.handled
+    ? '<div class="panel stack" id="ftpPrompt"><h2>Your FTP looks like ' + p.ftp + '. Update?</h2><div class="row">' +
+      '<button class="btn primary grow" data-act="ftp-use">Use ' + p.ftp + '</button>' +
+      '<button class="btn grow" data-act="ftp-keep">' + (state.ftp ? 'Keep ' + state.ftp : 'Not now') + '</button></div></div>' : '';
+  const buttons = S.fresh
+    ? '<button class="btn wide" data-act="export">Export TCX</button><button class="btn primary wide" data-act="done">Done</button>'
+    : '<button class="btn wide" data-act="export">Export TCX</button>' +
+      '<button class="btn danger wide' + (ui.armed === 'delete' ? ' armed' : '') + '" data-act="delete">' + (ui.armed === 'delete' ? 'Tap again to delete this ride' : 'Delete') + '</button>' +
+      '<button class="btn wide" data-act="go" data-to="history">Back</button>';
+  return '<div class="screen stack"><div><h1>' + esc(rec.name) + '</h1><div class="muted">' + fmtDateTime(rec.startedAt) +
+    (rec.ftp ? ' · FTP ' + rec.ftp : '') + '</div></div>' +
+    (tooShort ? '<div class="note">Too short to score. A ramp test needs at least 5 minutes.</div>' : '') +
+    prompt + '<div class="stats">' + cells + '</div>' + powerChart(rec, S.samples) +
+    '<div class="row" style="flex-wrap:wrap">' + buttons + '</div></div>';
+}
+
+// ---- History ----
+function viewHistory() {
+  const rows = ui.history.map(h =>
+    '<button class="item" data-act="open-ride" data-id="' + h.id + '"><span><b>' + esc(h.name) + '</b><br><small class="muted">' + fmtDateTime(h.startedAt) +
+    '</small></span><span class="muted" style="text-align:right">' + fmtClock(h.duration) + ' · NP ' + show(h.m.np) + ' · TSS ' +
+    (h.m.tss == null ? '—' : Math.round(h.m.tss)) + '</span></button>').join('');
+  return '<div class="screen"><div class="topbar"><button class="btn small" data-act="go" data-to="library">‹ Library</button><h2>History</h2></div>' +
+    '<div class="list">' + (rows || '<p class="muted">No rides yet. Finish one and it shows up here.</p>') + '</div></div>';
+}
+async function openRide(id) {
+  const rec = ui.history.find(r => r.id === id);
+  if (!rec) return;
+  let samples = [];
+  try { samples = await RideStore.samples(id); } catch (e) { /* show the summary without the chart */ }
+  state.summary = { rec, samples, metrics: null, proposal: null, fresh: false };
+  go('summary');
+}
+async function deleteRide() {
+  const S = state.summary;
+  if (!S) return;
+  try { await RideStore.del(S.rec.id); } catch (e) { /* ignore */ }
+  await refreshHistory();
+  go('history');
+}
+
+// ---- Settings ----
+function viewSettings() {
+  const tog = (k, label) => '<button class="btn wide' + (state.settings[k] ? ' on' : '') + '" data-act="toggle" data-k="' + k + '" aria-pressed="' + state.settings[k] +
+    '" style="justify-content:space-between"><span>' + label + '</span><b>' + (state.settings[k] ? 'On' : 'Off') + '</b></button>';
+  return '<div class="screen stack"><div class="topbar"><button class="btn small" data-act="go" data-to="library">‹ Library</button><h2>Settings</h2></div>' +
+    '<div class="panel stack"><h3>FTP (watts)</h3><div class="stepper">' +
+    [-10, -1].map(d => '<button class="btn" data-act="ftp-step" data-d="' + d + '">−' + (-d) + '</button>').join('') +
+    '<div class="val" id="ftpVal">' + (state.ftp || '—') + '</div>' +
+    [1, 10].map(d => '<button class="btn" data-act="ftp-step" data-d="' + d + '">+' + d + '</button>').join('') +
+    '</div><div class="muted">' + esc(ftpLine()) + '</div></div>' +
+    tog('voice', 'Voice prompts') + tog('beeps', 'Beeps before hard intervals') + tog('autoEase', 'Auto-ease when cadence drops') + tog('keepAwake', 'Keep the screen awake') +
+    '<button class="btn danger wide' + (ui.armed === 'clear' ? ' armed' : '') + '" data-act="clear">' +
+    (ui.armed === 'clear' ? 'Tap again to delete every ride' : 'Clear ride history') + '</button></div>';
+}
+
+// ---- Export: share sheet if possible, else a download link, else open the XML in a tab ----
+async function exportTcx() {
+  const S = state.summary;
+  if (!S) return;
+  const ride = { startedAt: S.rec.startedAt, name: S.rec.name, duration: S.rec.duration, samples: S.samples };
+  const xml = C.toTCX(ride), name = C.tcxFilename(ride), mime = 'application/vnd.garmin.tcx+xml';
+  try {
+    const file = new File([xml], name, { type: mime });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) { await navigator.share({ files: [file], title: S.rec.name }); return; }
+  } catch (e) { if (e && e.name === 'AbortError') return; }
+  const url = URL.createObjectURL(new Blob([xml], { type: mime }));
+  const a = document.createElement('a');
+  if ('download' in a) {
+    a.href = url; a.download = name; a.style.display = 'none';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } else window.open(url);
+}
+
+// ---- Click routing ----
+const ACT = {
+  go: d => go(d.to),
+  open: d => { ui.workoutId = d.id; ui.scale = 1; go('preview'); },
+  cat: d => { ui.cat = d.v; render(); },
+  dur: d => { ui.dur = ui.dur === d.v ? null : d.v; render(); },
+  'pre-scale': d => { ui.scale = clamp(round2(ui.scale + Number(d.d)), 0.5, 1.5); render(); },
+  start: () => startFlow(ui.workoutId),
+  'no-trainer': () => useNoTrainer(),
+  demo: () => useDemo(),
+  'connect-trainer': () => connectTrainer(),
+  'connect-hrm': () => connectHrm(),
+  reconnect: d => {
+    const dev = d.who === 'hrm' ? state.hrm : state.trainer;
+    if (dev && dev.reconnect) { $('toast').hidden = true; dev.reconnect(); }
+  },
+  'sheet-close': () => closeSheet(),
+  'sheet-ramp': () => { closeSheet(); ui.workoutId = 'ramp'; ui.scale = 1; go('preview'); },
+  'sheet-hand': () => { ui.sheet = 'hand'; renderSheet(); },
+  hand: d => { ui.handFtp = clamp(ui.handFtp + Number(d.d), 40, 700); renderSheet(); },
+  'sheet-use': () => { setFtp(ui.handFtp, 'manual'); closeSheet(); startFlow(ui.workoutId); },
+  pause: () => togglePause(),
+  skip: () => skipSegment(),
+  scale: d => adjustScale(Number(d.d)),
+  grade: d => adjustGrade(Number(d.d)),
+  end: () => { if (ui.armed === 'end') { ui.armed = null; finishRide(); } else arm('end'); },
+  'dismiss-note': () => { ui.noteDismissed = true; savePrefs(); updateRide(); },
+  'ftp-use': () => {
+    const S = state.summary;
+    if (!S || !S.proposal) return;
+    setFtp(S.proposal.ftp, S.proposal.kind); S.handled = true;
+    toast('FTP is now ' + state.ftp + '.'); render();
+  },
+  'ftp-keep': () => { if (state.summary) state.summary.handled = true; render(); },
+  export: () => exportTcx(),
+  done: () => go('library'),
+  'open-ride': d => openRide(Number(d.id)),
+  delete: () => { if (ui.armed === 'delete') { ui.armed = null; deleteRide(); } else arm('delete'); },
+  toggle: d => { state.settings[d.k] = !state.settings[d.k]; savePrefs(); render(); },
+  'ftp-step': d => { setFtp((state.ftp || 200) + Number(d.d), 'manual'); render(); },
+  clear: () => {
+    if (ui.armed !== 'clear') { arm('clear'); return; }
+    ui.armed = null;
+    RideStore.clear().catch(() => {}).then(refreshHistory).then(() => { toast('Ride history cleared.'); render(); });
+  }
+};
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-act]');
+  if (!el || el.disabled) return;
+  const fn = ACT[el.dataset.act];
+  if (fn) { try { fn(el.dataset, el); } catch (err) { console.error(err); } }
+});
+
+const VIEWS = { connect: viewConnect, library: viewLibrary, preview: viewPreview, ride: viewRide, summary: viewSummary, history: viewHistory, settings: viewSettings };
+
+// ---------------------------------------------------------------------------
+// Start up, and the test hooks (present only with ?sim=1 or ?speed=)
+// ---------------------------------------------------------------------------
+loadPrefs();
+render();
+refreshHistory().then(() => { if (state.screen === 'library') render(); });
+
+if (TESTING) {
+  window.__erg = {
+    state, ui, core: C, spoken: testLog.spoken, testLog,
+    startWorkout(id) { ui.workoutId = id; ui.scale = 1; if (!state.trainer) useDemo(); startFlow(id); return !!(state.ride && state.ride.workout.id === id && !state.ride.finished); },
+    getSamples() { return state.ride ? state.ride.samples : []; },
+    finish() { finishRide(); }
+  };
+}
+})();
+</script>
+</body>
+</html>
